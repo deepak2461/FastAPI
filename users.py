@@ -17,12 +17,11 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-class User(BaseModel):
-    id : int = Field(default_factory=lambda: len(users)+1, description="ID for the user")
+class UserCreate(BaseModel):
     name: str
     age: int
-    gender: str= Field(description="Gender of the user")
-    Address: Optional[str] = Field(default=None, description="Address of the user")
+    gender: str
+    Address: Optional[str] = None
 
     @field_validator("age")
     def validate_age(cls, value):
@@ -34,13 +33,23 @@ class User(BaseModel):
         "from_attributes": True     # This configuration allows Pydantic to create a User model instance from an instance of the db_models.User class, which is useful when retrieving user data from the database and returning it in the API response.
     }
 
+    
+
+class User(UserCreate):
+    id : int #= Field(default_factory=lambda: len(users)+1, description="ID for the user")
+    
+    
+    
+
+
+
 class Users(BaseModel):
     data: list[User]
     message: str
 
 
 
-users = []
+#users = []
 
 @router.get("/users", response_model=Users)
 def get_user(db: Session = Depends(get_db)):
@@ -48,10 +57,10 @@ def get_user(db: Session = Depends(get_db)):
     #print(users)
     count_of_users = db.query(db_models.User).count()
     #return Users(data=users, message="success")  # Added model_config in User pydantic class. Error :  Input should be a valid dictionary or instance of User [type=model_type, input_value=<db_models.User object at 0x0000011428169D90>, input_type=User] For further information visit https://errors.pydantic.dev/2.12/v/model_type
-    return {"data": users, "message": f"success retrieved {count_of_users} users"}
+    return {"data": users, "message": f"success -- Retrieved {count_of_users} users"}
 
 @router.post("/users")
-def create_user(user: User , db: Session = Depends(get_db)):
+def create_user(user: UserCreate , db: Session = Depends(get_db)):
     # users.append(user.model_dump())
     # return {"data": user, "message": "user created successfully"}
 
@@ -65,6 +74,6 @@ def create_user(user: User , db: Session = Depends(get_db)):
     db.add(users)
     db.commit()
     db.refresh(users)
-    return {"data": users, "message": "user created successfully"}
+    return {"data": users, "message": f"user with id {users.id} created successfully"}
 
 
