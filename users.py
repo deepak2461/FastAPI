@@ -6,7 +6,6 @@ from typing import Optional
 
 from datetime import datetime
 
-
 from db_conf import get_db
 import db_models
 
@@ -33,11 +32,15 @@ class UserCreate(BaseModel):
         "from_attributes": True     # This configuration allows Pydantic to create a User model instance from an instance of the db_models.User class, which is useful when retrieving user data from the database and returning it in the API response.
     }
 
-    
+
+
+
+
 
 class User(UserCreate):
-    id : int #= Field(default_factory=lambda: len(users)+1, description="ID for the user")
-    
+    id: int             #= Field(default_factory=lambda: len(users)+1, description="ID for the user")
+    username: str
+ 
     
     
 
@@ -74,6 +77,10 @@ def create_user(user: UserCreate , db: Session = Depends(get_db)):
     db.add(users)
     db.commit()
     db.refresh(users)
-    return {"data": users, "message": f"user with id {users.id} created successfully"}
+
+    users.username = f"{users.name}_{users.id}"
+    db.commit()
+    db.refresh(users)
+    return {"data": users, "message": f"user with id {users.id} and username {users.username} created successfully"}
 
 

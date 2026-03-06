@@ -26,9 +26,10 @@ class task_list(Base):
     
 
 class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    __tablename__ = 'users_temp'
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)  # SELECT setval('users_id_seq', (SELECT MAX(id) FROM users)); 
     name = Column(String)
+    username = Column(String, unique=True)
     age = Column(Integer)
     gender = Column(String)
     Address = Column(String, nullable=True)
