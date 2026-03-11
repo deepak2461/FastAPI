@@ -15,9 +15,9 @@ conn  = engine.raw_connection()
 cursor = conn.cursor()
 
 #cursor.execute('select * from task_list ;')
-df = pd.read_sql_query('select * from task_list ;', con=engine)
+#df = pd.read_sql_query('select * from tasks ;', con=engine)
 #res = cursor.fetchall()
-print(df)
+#print(df)
 
 
 SessionLocal = sessionmaker(
